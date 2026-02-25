@@ -1,0 +1,13 @@
+[
+  { "name": "Dialog Zoom", "desc": "Optimal for Zoom & Teams", "link": "#", "vless": "vless://DIALOG_ZOOM_CONFIG" },
+  { "name": "Dialog Tiktok", "desc": "Work with Tiktok Package", "link": "#", "vless": "vless://DIALOG_TIKTOK_CONFIG" },
+  { "name": "SLT Zoom", "desc": "Best for SLT Education Data", "link": "#", "vless": "vless://SLT_ZOOM_CONFIG" },
+  { "name": "SLT Netflix", "desc": "Work with Netflix Package", "link": "#", "vless": "vless://SLT_NETFLIX_CONFIG" },
+  { "name": "Mobitel Zoom", "desc": "Works with E-Learning", "link": "#", "vless": "vless://MOBITEL_ZOOM_CONFIG" },
+  { "name": "Hutch Zoom", "desc": "Work with Zoom & Office", "link": "#", "vless": "vless://HUTCH_ZOOM_CONFIG" },
+  { "name": "Hutch Gaming", "desc": "Low latency for Gaming", "link": "#", "vless": "vless://HUTCH_GAMING_CONFIG" },
+  { "name": "Hutch Social", "desc": "Non-stop Social Config", "link": "#", "vless": "vless://HUTCH_SOCIAL_CONFIG" },
+  { "name": "Airtel Zoom", "desc": "Work with Zoom Package", "link": "#", "vless": "vless://AIRTEL_ZOOM_CONFIG" },
+  { "name": "Airtel Tiktok", "desc": "High speed for Tiktok", "link": "#", "vless": "vless://AIRTEL_TIKTOK_CONFIG" },
+  { "name": "Airtel 389 / 909", "desc": "Work with 389 & 909 Plans", "link": "#", "vless": "vless://AIRTEL_389_CONFIG" }
+]
