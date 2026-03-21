@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetroX - Official Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --sidebar-bg: #1e293b;
+            --card-bg: #1e293b;
+            --accent-purple: #c026d3;
+            --accent-blue: #3b82f6;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --success: #10b981;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); display: flex; min-height: 100vh; overflow-x: hidden; }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            padding: 25px;
+            position: fixed;
+            height: 100vh;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(to right, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links { list-style: none; flex-grow: 1; }
+        .nav-links li { margin-bottom: 8px; }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-muted);
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-radius: 12px;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background: linear-gradient(90deg, #8b5cf6, #ec4899);
+            color: white;
+        }
+
+        #cart-count {
+            position: absolute;
+            right: 10px;
+            background: var(--accent-purple);
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: none;
+        }
+
+        /* Main Content Area */
+        .main-content { margin-left: 260px; flex: 1; padding: 40px; padding-bottom: 80px; }
+        .section-content { display: none; }
+        .section-content.active { display: block; animation: fadeIn 0.5s; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Package Cards */
+        .package-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .package-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            transition: 0.3s;
+        }
+        .package-card:hover { border-color: var(--accent-blue); transform: translateY(-3px); }
+
+        .pkg-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .pkg-title { font-weight: 700; color: var(--accent-blue); text-transform: uppercase; font-size: 0.9rem; }
+        .pkg-price { font-weight: 700; color: white; font-size: 1rem; }
+
+        .features { list-style: none; margin-bottom: 20px; }
+        .features li {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: rgba(255,255,255,0.05);
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-buy {
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-blue);
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-buy:hover { background: var(--accent-blue); color: white; }
+
+        .logout-btn {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: auto;
+        }
+
+        /* Profile & Account Details */
+        .profile-container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            margin-top: 20px;
+        }
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .info-row:last-child { border-bottom: none; }
+
+        /* Orders Container */
+        .order-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        .no-orders-state { text-align: center; padding: 60px 0; }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 260px;
+            right: 0;
+            background: rgba(15, 23, 42, 0.9);
+            padding: 15px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="logo"><i class="fas fa-infinity"></i> NETROX</div>
+        <ul class="nav-links">
+            <li><a href="#" class="active" onclick="showPage('dashboard', this)"><i class="fas fa-th-large"></i> Dashboard</a></li>
+            <li><a href="#" onclick="showPage('packages', this)"><i class="fas fa-box"></i> Packages</a></li>
+            <li><a href="#" onclick="showPage('orders', this)"><i class="fas fa-shopping-cart"></i> Orders <span id="cart-count">0</span></a></li>
+            <li><a href="#" onclick="showPage('accounts', this)"><i class="fas fa-user"></i> My Account</a></li>
+            <li><a href="#" onclick="showPage('messages', this)"><i class="fas fa-envelope"></i> Messages</a></li>
+        </ul>
+        <a href="#" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+
+    <div class="main-content">
+        <div id="dashboard" class="section-content active">
+            <h2>Welcome Back, <span class="user-display-name">Kalpika</span>!</h2>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">Your VPN account overview</p>
+            <div class="package-grid">
+                <div class="package-card" style="text-align: center;"><h3>12 GB</h3><p style="color: var(--text-muted);">Used Today</p></div>
+                <div class="package-card" style="text-align: center;"><h3>18 Days</h3><p style="color: var(--text-muted);">Validity</p></div>
+            </div>
+        </div>
+
+        <div id="packages" class="section-content">
+            <h2>Available Packages</h2>
+            <div class="package-grid" id="packageList">
+                </div>
+        </div>
+
+        <div id="orders" class="section-content">
+            <h2>My Orders</h2>
+            <div class="order-container">
+                <div id="empty-cart-state" class="no-orders-state">
+                    <i class="fas fa-shopping-cart" style="font-size: 3rem; color: #334155; margin-bottom: 15px;"></i>
+                    <h3>No Orders Found</h3>
+                    <p style="color: var(--text-muted);">Add items from Packages to see them here.</p>
+                </div>
+                <div id="active-cart-state" style="display: none;">
+                    <div id="cart-items-list"></div>
+                    <div style="margin-top: 20px; text-align: right; border-top: 1px solid #334155; padding-top: 20px;">
+                        <h3>Total: Rs <span id="cart-total-price">0.00</span></h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="accounts" class="section-content">
+            <h2>Account Details</h2>
+            <div class="profile-container">
+                <div class="user-avatar"><i class="fas fa-user"></i></div>
+                <div class="info-row"><span>Full Name</span><strong class="user-display-name">Kalpika</strong></div>
+                <div class="info-row"><span>Email Address</span><strong>kalpika@example.com</strong></div>
+                <div class="info-row"><span>Account Status</span><span style="color: var(--success); font-weight: bold;">Active Member</span></div>
+                <div class="info-row"><span>Registration Date</span><strong>2026-01-15</strong></div>
+                <div class="info-row"><span>Total Orders</span><strong id="total-orders-count">0</strong></div>
+            </div>
+        </div>
+
+        <div id="messages" class="section-content"><h2>Support Messages</h2><p>No new messages.</p></div>
+    </div>
+
+    <footer>
+        © 2026 NETROX , All Rights Reserved. Designed & Developed By Kalpika™
+    </footer>
+
+    <script>
+        // පැකේජ ලැයිස්තුව - 100GB (100), 200GB (200), Unlimited (450)
+        const packageData = [
+            { name: "Dialog Zoom (Router)", price: 450, data: "Unlimited" },
+            { name: "Dialog Zoom (Sim) - Speed Limit", price: 200, data: "200 GB" },
+            { name: "Dialog Tiktok (Speed Limit)", price: 100, data: "100 GB" },
+            { name: "SLT Zoom", price: 450, data: "Unlimited" },
+            { name: "SLT Netflix", price: 450, data: "Unlimited" },
+            { name: "Mobitel Zoom", price: 200, data: "200 GB" },
+            { name: "Hutch Zoom", price: 200, data: "200 GB" },
+            { name: "Hutch Gaming", price: 450, data: "Unlimited" },
+            { name: "Hutch Social", price: 100, data: "100 GB" },
+            { name: "Airtel Zoom", price: 200, data: "200 GB" },
+            { name: "Airtel Tiktok (Speed Limit)", price: 100, data: "100 GB" },
+            { name: "Airtel 389 / 909 (Speed Limit)", price: 100, data: "100 GB" }
+        ];
+
+        let cart = [];
+
+        // Packages පෙන්වීම
+        const container = document.getElementById('packageList');
+        packageData.forEach((pkg, index) => {
+            container.innerHTML += `
+                <div class="package-card">
+                    <div class="pkg-header">
+                        <div class="pkg-title">${pkg.name}</div>
+                        <div class="pkg-price">Rs ${pkg.price}.00</div>
+                    </div>
+                    <ul class="features">
+                        <li><i class="fas fa-check-circle"></i> ${pkg.data} / 30 Days</li>
+                        <li><i class="fas fa-bolt"></i> Premium Server Access</li>
+                    </ul>
+                    <button class="btn-buy" onclick="addToCart(${index})">Buy Now</button>
+                </div>
+            `;
+        });
+
+        function addToCart(index) {
+            cart.push(packageData[index]);
+            updateCartUI();
+            alert(packageData[index].name + " added to orders!");
+        }
+
+        function updateCartUI() {
+            const countEl = document.getElementById('cart-count');
+            const totalOrdersEl = document.getElementById('total-orders-count');
+            countEl.innerText = cart.length;
+            totalOrdersEl.innerText = cart.length;
+            countEl.style.display = cart.length > 0 ? 'block' : 'none';
+
+            const emptyState = document.getElementById('empty-cart-state');
+            const activeState = document.getElementById('active-cart-state');
+            const listEl = document.getElementById('cart-items-list');
+            const totalEl = document.getElementById('cart-total-price');
+
+            if (cart.length > 0) {
+                emptyState.style.display = 'none';
+                activeState.style.display = 'block';
+                listEl.innerHTML = '';
+                let total = 0;
+                cart.forEach(item => {
+                    total += item.price;
+                    listEl.innerHTML += `<div class="info-row"><span>${item.name}</span><strong>Rs ${item.price}.00</strong></div>`;
+                });
+                totalEl.innerText = total.toFixed(2);
+            }
+        }
+
+        function showPage(pageId, elm) {
+            document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            elm.classList.add('active');
+        }
+
+         document.addEventListener('DOMContentLoaded', () => {
+    const user = JSON.parse(localStorage.getItem('netrox_user'));
+    
+});
+    </script>
+</body>
+</html>
