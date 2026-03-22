@@ -11,7 +11,7 @@
             --bg-dark: #0f172a;
             --sidebar-bg: #1e293b;
             --card-bg: #1e293b;
-            --accent-purple: #3b82f6;
+            --accent-purple: #3b82f6; /* Blue Color */
             --accent-blue: #3b82f6;
             --text-main: #ffffff;
             --text-muted: #94a3b8;
@@ -22,12 +22,25 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background-color: var(--bg-dark); color: var(--text-main); display: flex; min-height: 100vh; overflow-x: hidden; }
 
-        .sidebar { width: 260px; background-color: var(--sidebar-bg); padding: 25px; position: fixed; height: 100vh; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; z-index: 100; }
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            padding: 25px;
+            position: fixed;
+            height: 100vh;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
 
+        /* Mobile View Fix */
         @media (max-width: 768px) {
             body { flex-direction: column; }
             .sidebar { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid var(--border-color); padding: 15px; }
             .nav-links { display: flex; overflow-x: auto; gap: 10px; padding-bottom: 5px; }
+            .nav-links li { margin-bottom: 0; flex-shrink: 0; }
             .main-content { margin-left: 0 !important; padding: 20px !important; }
             footer { left: 0 !important; }
         }
@@ -60,7 +73,26 @@
         .btn-buy { width: 100%; padding: 10px; border-radius: 10px; border: none; background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); font-weight: 600; cursor: pointer; transition: 0.3s; }
         .btn-buy:hover { background: var(--accent-blue); color: white; }
 
-        .btn-checkout { margin-top: 20px; width: 100%; padding: 15px; background: var(--accent-blue); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-remove { color: #ef4444; cursor: pointer; transition: 0.3s; font-size: 1rem; margin-left: 12px; }
+        .btn-remove:hover { color: #f87171; transform: scale(1.1); }
+
+        .btn-checkout {
+            margin-top: 20px;
+            width: 100%;
+            padding: 15px;
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
         .btn-checkout:hover { background: #1d4ed8; transform: scale(1.02); }
 
         .logout-btn { background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 12px; border-radius: 12px; text-align: center; text-decoration: none; font-weight: 600; margin-top: auto; border: none; cursor: pointer; }
@@ -117,10 +149,18 @@
 
         <div id="orders" class="section-content">
             <h2>My Orders</h2>
-            <div id="empty-cart-state" style="text-align: center; padding: 40px;"><h3>No Orders Found</h3></div>
-            <div id="active-cart-state" style="display: none;">
-                <div id="cart-items-list"></div>
-                <button class="btn-checkout" onclick="sendWhatsApp()">Proceed to Checkout</button>
+            <div class="order-container">
+                <div id="empty-cart-state" class="no-orders-state" style="text-align: center; padding: 40px;">
+                    <i class="fas fa-shopping-cart" style="font-size: 3rem; color: #334155; margin-bottom: 15px;"></i>
+                    <h3>No Orders Found</h3>
+                </div>
+                <div id="active-cart-state" style="display: none;">
+                    <div id="cart-items-list"></div>
+                    <div style="margin-top: 20px; text-align: right; border-top: 1px solid #334155; padding-top: 20px;">
+                        <h3>Total: Rs <span id="cart-total-price">0.00</span></h3>
+                        <button class="btn-checkout" onclick="sendWhatsApp()"><i class="fab fa-whatsapp"></i> Proceed to Checkout</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -128,14 +168,16 @@
             <h2>Account Details</h2>
             <div class="profile-container">
                 <div class="user-avatar" id="acc-avatar"><i class="fas fa-user"></i></div>
-                <div class="info-row"><span>Email</span><strong id="acc-email">...</strong></div>
+                <div class="info-row"><span>Full Name</span><strong id="acc-name" class="user-display-name">Guest</strong></div>
+                <div class="info-row"><span>Email Address</span><strong id="acc-email">...</strong></div>
+                <div class="info-row"><span>Account Status</span><span style="color: var(--success); font-weight: bold;">Active Member</span></div>
             </div>
         </div>
 
-        <div id="messages" class="section-content"><h2>Support</h2><p>No new messages.</p></div>
+        <div id="messages" class="section-content"><h2>Support Messages</h2><p>No new messages.</p></div>
     </div>
 
-    <footer>© 2026 NETROX</footer>
+    <footer>© 2026 NETROX , All Rights Reserved. Designed & Developed By Kalpika™</footer>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -154,16 +196,85 @@
         const auth = firebase.auth();
         const provider = new firebase.auth.GoogleAuthProvider();
 
-        function signIn() { auth.signInWithPopup(provider).then(res => { updateUI(res.user); document.getElementById('login-overlay').style.display = 'none'; }); }
-        function signOut() { auth.signOut().then(() => { location.reload(); }); }
+        const packageData = [
+            { name: "Dialog Zoom (Router)", price: 450, data: "Unlimited" },
+            { name: "Dialog Zoom (Sim) - Speed Limit", price: 200, data: "200 GB" },
+            { name: "Dialog Tiktok (Speed Limit)", price: 100, data: "100 GB" },
+            { name: "SLT Zoom", price: 450, data: "Unlimited" },
+            { name: "SLT Netflix", price: 450, data: "Unlimited" },
+            { name: "Mobitel Zoom", price: 200, data: "200 GB" },
+            { name: "Hutch Zoom", price: 200, data: "200 GB" },
+            { name: "Hutch Gaming", price: 450, data: "Unlimited" },
+            { name: "Hutch Social", price: 100, data: "100 GB" },
+            { name: "Airtel Zoom", price: 200, data: "200 GB" },
+            { name: "Airtel Tiktok (Speed Limit)", price: 100, data: "100 GB" },
+            { name: "Airtel 389 / 909 (Speed Limit)", price: 100, data: "100 GB" }
+        ];
+
+        let cart = [];
+        const container = document.getElementById('packageList');
+        packageData.forEach((pkg, index) => {
+            container.innerHTML += `<div class="package-card"><div class="pkg-header"><div class="pkg-title">${pkg.name}</div><div class="pkg-price">Rs ${pkg.price}.00</div></div><ul class="features"><li><i class="fas fa-check-circle"></i> ${pkg.data} / 30 Days</li></ul><button class="btn-buy" onclick="addToCart(${index})">Buy Now</button></div>`;
+        });
+
+        function addToCart(index) {
+            cart.push(packageData[index]);
+            updateCartUI();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            document.getElementById('cart-count').innerText = cart.length;
+            document.getElementById('cart-count').style.display = cart.length > 0 ? 'block' : 'none';
+            const emptyState = document.getElementById('empty-cart-state');
+            const activeState = document.getElementById('active-cart-state');
+            const listEl = document.getElementById('cart-items-list');
+            const totalEl = document.getElementById('cart-total-price');
+
+            if (cart.length > 0) {
+                emptyState.style.display = 'none'; activeState.style.display = 'block';
+                listEl.innerHTML = ''; let total = 0;
+                cart.forEach((item, index) => { 
+                    total += item.price; 
+                    listEl.innerHTML += `<div class="info-row">
+                        <div style="display:flex; align-items:center;">
+                            <span>${item.name}</span>
+                            <i class="fas fa-trash-alt btn-remove" onclick="removeFromCart(${index})" title="Remove"></i>
+                        </div>
+                        <strong>Rs ${item.price}.00</strong>
+                    </div>`; 
+                });
+                totalEl.innerText = total.toFixed(2);
+            } else {
+                emptyState.style.display = 'block'; activeState.style.display = 'none';
+            }
+        }
+
+        function signIn() {
+            auth.signInWithPopup(provider).then(res => {
+                updateUI(res.user);
+                document.getElementById('login-overlay').style.display = 'none';
+            });
+        }
+
+        function signOut() {
+            auth.signOut().then(() => { location.reload(); });
+        }
 
         function updateUI(user) {
             document.querySelectorAll('.user-display-name').forEach(el => el.innerText = user.displayName);
             document.getElementById('acc-email').innerText = user.email;
-            if(user.photoURL) document.getElementById('acc-avatar').innerHTML = `<img src="${user.photoURL}">`;
+            if(user.photoURL) {
+                document.getElementById('acc-avatar').innerHTML = `<img src="${user.photoURL}">`;
+            }
 
-            // !--- අනිවාර්යයෙන්ම පහත URL එක ඔයාගේ Worker URL එකට වෙනස් කරන්න ---!
-            const workerURL = `https://netrox-api.rasanga.workers.dev/?email=${user.email}`;
+            // --- Cloudflare Worker දත්ත ලබාගැනීම ---
+            // මෙතනට ඔයාගේ Worker ලින්ක් එක අනිවාර්යයෙන්ම දාන්න (උදා: https://netrox-api.rasanga.workers.dev)
+            const workerURL = `https://netrox-api.kalpikachampathi.workers.dev/?email=${user.email}`;
 
             fetch(workerURL)
                 .then(res => res.json())
@@ -172,12 +283,33 @@
                     document.getElementById("expiry-display").innerText = data.expiry || "No Plan";
                 })
                 .catch(err => {
-                    console.error("Worker Fetch Error:", err);
+                    console.error("Worker Error:", err);
                     document.getElementById("usage-display").innerText = "Error";
                 });
         }
 
-        auth.onAuthStateChanged(user => { if (user) { updateUI(user); document.getElementById('login-overlay').style.display = 'none'; } });
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                updateUI(user);
+                document.getElementById('login-overlay').style.display = 'none';
+            }
+        });
+
+        function sendWhatsApp() {
+            const user = auth.currentUser;
+            let packageList = "";
+            let total = 0;
+            cart.forEach((item, index) => {
+                packageList += `${index + 1}. ${item.name} (Rs.${item.price})\n`;
+                total += item.price;
+            });
+            const message = `*--- NETROX ORDER ---*\n\n` +
+                            `*Name:* ${user.displayName}\n` +
+                            `*Email:* ${user.email}\n\n` +
+                            `*Packages:*\n${packageList}\n` +
+                            `*Total:* Rs.${total}.00`;
+            window.open(`https://wa.me/94760216144?text=${encodeURIComponent(message)}`, '_blank');
+        }
 
         function showPage(pageId, elm) {
             document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
