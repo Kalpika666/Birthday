@@ -140,8 +140,8 @@
             <h2>Welcome Back, <span id="welcome-name" class="user-display-name">Guest</span>!</h2>
             <p style="color: var(--text-muted); margin-bottom: 30px;">Your VPN account overview</p>
             <div class="package-grid">
-                <div class="package-card" style="text-align: center;"><h3>12 GB</h3><p style="color: var(--text-muted);">Used Today</p></div>
-                <div class="package-card" style="text-align: center;"><h3>18 Days</h3><p style="color: var(--text-muted);">Validity</p></div>
+                <div class="package-card" style="text-align: center;"><h3 id="usage-display">0 GB</h3><p style="color: var(--text-muted);">Used Traffic</p></div>
+                <div class="package-card" style="text-align: center;"><h3 id="expiry-display">No Plan</h3><p style="color: var(--text-muted);">Expiry Date</p></div>
             </div>
         </div>
 
@@ -186,7 +186,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
     <script>
-        // Your Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCvUlVKoDIPG_w23ZzyHLpcyRO1yEfqmmU",
             authDomain: "netrox-database.firebaseapp.com",
@@ -196,7 +195,6 @@
             appId: "1:847178411597:web:827582517f94cec141f604"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const provider = new firebase.auth.GoogleAuthProvider();
@@ -259,7 +257,6 @@
             }
         }
 
-        // Firebase Auth Logic
         function signIn() {
             auth.signInWithPopup(provider).then(res => {
                 updateUI(res.user);
@@ -277,6 +274,21 @@
             if(user.photoURL) {
                 document.getElementById('acc-avatar').innerHTML = `<img src="${user.photoURL}">`;
             }
+
+            // --- Cloudflare Worker එකෙන් Live Usage ලබාගැනීම ---
+            // මෙතනට ඔයාගේ Worker එකේ URL එක දාන්න
+            const workerURL = `https://netrox-api.ඔයාගේ-නම.workers.dev/?email=${user.email}`;
+
+            fetch(workerURL)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("usage-display").innerText = data.usage || "0 GB";
+                    document.getElementById("expiry-display").innerText = data.expiry || "No Plan";
+                })
+                .catch(err => {
+                    console.error("Fetch error:", err);
+                    document.getElementById("usage-display").innerText = "Error";
+                });
         }
 
         auth.onAuthStateChanged(user => {
