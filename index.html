@@ -11,7 +11,7 @@
             --bg-dark: #0f172a;
             --sidebar-bg: #1e293b;
             --card-bg: #1e293b;
-            --accent-purple: #3b82f6;
+            --accent-purple: #3b82f6; /* Blue Color */
             --accent-blue: #3b82f6;
             --text-main: #ffffff;
             --text-muted: #94a3b8;
@@ -198,7 +198,7 @@
         let cart = [];
         const container = document.getElementById('packageList');
         packageData.forEach((pkg, index) => {
-            container.innerHTML += `<div class="package-card"><div class="pkg-header"><div class="pkg-title">${pkg.name}</div><div class="pkg-price">Rs ${pkg.price}.00</div></div><ul class="features"><li><i class="fas fa-check-circle"></i> ${pkg.data} / 30 Days</li></ul><button class="btn-buy" onclick="addToCart(${index})">Buy Now</button></div>`;
+            container.innerHTML += `<div class=\"package-card\"><div class=\"pkg-header\"><div class=\"pkg-title\">${pkg.name}</div><div class=\"pkg-price\">Rs ${pkg.price}.00</div></div><ul class=\"features\"><li><i class=\"fas fa-check-circle\"></i> ${pkg.data} / 30 Days</li></ul><button class=\"btn-buy\" onclick=\"addToCart(${index})\">Buy Now</button></div>`;
         });
 
         function addToCart(index) { cart.push(packageData[index]); updateCartUI(); }
@@ -211,7 +211,7 @@
                 document.getElementById('empty-cart-state').style.display = 'none';
                 document.getElementById('active-cart-state').style.display = 'block';
                 let list = ''; let total = 0;
-                cart.forEach((item, idx) => { total += item.price; list += `<div class="info-row"><span>${item.name}</span><strong>Rs ${item.price}.00 <i class="fas fa-trash btn-remove" onclick="removeFromCart(${idx})"></i></strong></div>`; });
+                cart.forEach((item, idx) => { total += item.price; list += `<div class=\"info-row\"><span>${item.name}</span><strong>Rs ${item.price}.00 <i class=\"fas fa-trash btn-remove\" onclick=\"removeFromCart(${idx})\"></i></strong></div>`; });
                 document.getElementById('cart-items-list').innerHTML = list;
                 document.getElementById('cart-total-price').innerText = total.toFixed(2);
             } else {
@@ -226,7 +226,7 @@
         function updateUI(user) {
             document.querySelectorAll('.user-display-name').forEach(el => el.innerText = user.displayName);
             document.getElementById('acc-email').innerText = user.email;
-            if(user.photoURL) document.getElementById('acc-avatar').innerHTML = `<img src="${user.photoURL}">`;
+            if(user.photoURL) document.getElementById('acc-avatar').innerHTML = `<img src=\"${user.photoURL}\">`;
 
             // LIVE USAGE FETCH
             const workerURL = `https://netrox-api.rasanga.workers.dev/?email=${user.email}`;
@@ -237,29 +237,36 @@
                 document.getElementById("usage-progress").style.width = (per > 100 ? 100 : per) + "%";
                 document.getElementById("usage-percentage").innerText = per.toFixed(1) + "% Used";
                 document.getElementById("expiry-display").innerText = "Valid: " + (data.expiry || "Active");
-            }).catch(e => console.log("Usage load error"));
+            }).catch(e => {
+                console.log("Usage load error");
+                document.getElementById("usage-display").innerText = "Error";
+            });
             
             window.currentUserEmail = user.email;
         }
 
         async function copyVpnConfig() {
             const btn = document.getElementById('copy-config-btn');
-            const configWorker = `https://netrox-config-fetcher.kalpikachampathi.workers.dev/?email=${window.currentUserEmail}`;
+            const configWorker = `https://netrox-config-fetcher.rasanga.workers.dev/?email=${window.currentUserEmail}`;
             try {
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching...';
-                const res = await fetch(configWorker); const txt = await res.text();
+                btn.innerHTML = '<i class=\"fas fa-spinner fa-spin\"></i> Fetching...';
+                const res = await fetch(configWorker); 
+                const txt = await res.text();
                 await navigator.clipboard.writeText(txt);
-                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy"></i> Copy Config'; }, 2000);
-            } catch (e) { btn.innerHTML = 'Error!'; }
+                btn.innerHTML = '<i class=\"fas fa-check\"></i> Copied!';
+                setTimeout(() => { btn.innerHTML = '<i class=\"fas fa-copy\"></i> Copy Config'; }, 2000);
+            } catch (e) { 
+                btn.innerHTML = 'Error!'; 
+                setTimeout(() => { btn.innerHTML = '<i class=\"fas fa-copy\"></i> Copy Config'; }, 2000);
+            }
         }
 
         auth.onAuthStateChanged(user => { if (user) { updateUI(user); document.getElementById('login-overlay').style.display = 'none'; } });
 
         function sendWhatsApp() {
             const user = auth.currentUser; let list = ""; let total = 0;
-            cart.forEach((item, i) => { list += `${i+1}. ${item.name}\n`; total += item.price; });
-            const msg = `*NETROX ORDER*\nName: ${user.displayName}\nItems:\n${list}Total: Rs.${total}`;
+            cart.forEach((item, i) => { list += `${i+1}. ${item.name}\\n`; total += item.price; });
+            const msg = `*NETROX ORDER*\\nName: ${user.displayName}\\nItems:\\n${list}Total: Rs.${total}`;
             window.open(`https://wa.me/94760216144?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
