@@ -23,7 +23,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background-color: var(--bg-dark); color: var(--text-main); display: flex; min-height: 100vh; overflow-x: hidden; }
 
-        /* Sidebar */
         .sidebar { width: 260px; background-color: var(--sidebar-bg); padding: 25px; position: fixed; height: 100vh; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; z-index: 100; }
         .logo { font-size: 1.5rem; font-weight: 800; margin-bottom: 40px; display: flex; align-items: center; gap: 10px; background: linear-gradient(to right, #3b82f6, #2dd4bf); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .nav-links { list-style: none; flex-grow: 1; }
@@ -31,14 +30,12 @@
         .nav-links a { text-decoration: none; color: var(--text-muted); padding: 12px 15px; display: flex; align-items: center; gap: 12px; border-radius: 12px; transition: 0.3s; }
         .nav-links a:hover, .nav-links a.active { background: linear-gradient(90deg, #3b82f6, #1d4ed8); color: white; }
 
-        /* Main Content */
         .main-content { margin-left: 260px; flex: 1; padding: 40px; padding-bottom: 80px; }
         .section-content { display: none; }
         .section-content.active { display: block; animation: fadeIn 0.5s; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Dashboard Styles from your image */
         .dash-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
         .usage-card { background: var(--card-bg); padding: 25px; border-radius: 24px; border: 1px solid var(--border-color); position: relative; overflow: hidden; }
         .region-badge { position: absolute; top: 15px; right: 20px; background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); padding: 6px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; }
@@ -46,14 +43,12 @@
         .progress-container { width: 100%; background: #334155; height: 12px; border-radius: 10px; margin: 20px 0; overflow: hidden; }
         .progress-bar { height: 100%; background: linear-gradient(90deg, #3b82f6, #2dd4bf); width: 0%; transition: 1s ease-in-out; }
 
-        /* Package Cards */
         .package-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
         .package-card { background: var(--card-bg); padding: 25px; border-radius: 20px; border: 1px solid var(--border-color); transition: 0.3s; }
         .package-card:hover { border-color: var(--accent-blue); transform: translateY(-3px); }
         .btn-buy { width: 100%; padding: 12px; border-radius: 12px; border: none; background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); font-weight: 600; cursor: pointer; margin-top: 15px; }
         .btn-buy:hover { background: var(--accent-blue); color: white; }
 
-        /* Login Overlay */
         #login-overlay { position: fixed; inset: 0; background: var(--bg-dark); z-index: 2000; display: flex; align-items: center; justify-content: center; }
         .login-card { background: var(--sidebar-bg); padding: 40px; border-radius: 24px; border: 1px solid var(--border-color); text-align: center; width: 90%; max-width: 400px; }
         .btn-google { width: 100%; padding: 14px; border-radius: 12px; border: none; background: white; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; }
@@ -167,14 +162,16 @@
 
         function loadPackages() {
             const container = document.getElementById('packageList');
-            container.innerHTML = packageData.map(pkg => `
-                <div class="package-card">
-                    <h3 style="color: var(--accent-blue); font-size: 1rem;">${pkg.name}</h3>
-                    <p style="margin: 10px 0; font-size: 1.2rem; font-weight: 700;">Rs. ${pkg.price}.00</p>
-                    <p style="font-size: 0.85rem; color: var(--text-muted);"><i class="fas fa-database"></i> ${pkg.data} / 30 Days</p>
-                    <button class="btn-buy" onclick="sendWhatsApp('${pkg.name}', ${pkg.price})">Buy Now</button>
-                </div>
-            `).join('');
+            if (container) {
+                container.innerHTML = packageData.map(pkg => `
+                    <div class="package-card">
+                        <h3 style="color: var(--accent-blue); font-size: 1rem;">${pkg.name}</h3>
+                        <p style="margin: 10px 0; font-size: 1.2rem; font-weight: 700;">Rs. ${pkg.price}.00</p>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);"><i class="fas fa-database"></i> ${pkg.data} / 30 Days</p>
+                        <button class="btn-buy" onclick="sendWhatsApp('${pkg.name}', ${pkg.price})">Buy Now</button>
+                    </div>
+                `).join('');
+            }
         }
 
         function signIn() { auth.signInWithPopup(provider); }
@@ -185,7 +182,6 @@
             document.getElementById('acc-email').innerText = user.email;
             if (user.photoURL) document.getElementById('acc-avatar').innerHTML = `<img src="${user.photoURL}">`;
             
-            // Fetch usage
             fetch(`https://netrox-api.kalpikachampathi.workers.dev/?email=${user.email}`)
                 .then(res => res.json())
                 .then(data => {
@@ -194,7 +190,7 @@
                     document.getElementById("usage-display").innerText = used.toFixed(2) + " GB";
                     document.getElementById("usage-progress").style.width = (per > 100 ? 100 : per) + "%";
                     document.getElementById("usage-percentage").innerText = per.toFixed(1) + "% Used";
-                });
+                }).catch(e => console.log("Usage load error"));
             window.currentUserEmail = user.email;
         }
 
@@ -202,7 +198,7 @@
             const btn = document.getElementById('copy-btn');
             try {
                 btn.innerText = "Fetching...";
-                const res = await fetch(`https://netrox-config-fetcher.kalpikachampathi.workers.dev//?email=${window.currentUserEmail}`);
+                const res = await fetch(`https://netrox-config-fetcher.kalpikachampathi.workers.dev/?email=${window.currentUserEmail}`);
                 const config = await res.text();
                 await navigator.clipboard.writeText(config);
                 btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
