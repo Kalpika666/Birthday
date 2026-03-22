@@ -111,23 +111,23 @@
             <div class="package-grid">
                 <div class="package-card" style="grid-column: span 2;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <p style="color: var(--text-muted); font-size: 0.9rem;">Today's Live Usage</p>
-                        <span id="usage-percentage" style="background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">0% Used</span>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Usage Details</p>
+                        <span id="usage-percentage" style="background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">Calculating...</span>
                     </div>
                     <h3 id="usage-display" style="font-size: 2.2rem; margin: 15px 0;">0.00 GB</h3>
                     <div style="width: 100%; background: #334155; height: 12px; border-radius: 10px; overflow: hidden;">
                         <div id="usage-progress" style="width: 0%; background: linear-gradient(90deg, #3b82f6, #2dd4bf); height: 100%; border-radius: 10px; transition: 1s ease-in-out;"></div>
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-top: 10px;">
-                        <p id="limit-text" style="font-size: 0.75rem; color: var(--text-muted);">Plan: 100 GB Limit</p>
-                        <p id="expiry-display" style="font-size: 0.75rem; color: #10b981; font-weight: 600;">Valid: --</p>
+                        <p id="limit-text" style="font-size: 0.75rem; color: var(--text-muted);">Monthly Limit: --</p>
+                        <p id="expiry-display" style="font-size: 0.75rem; color: #10b981; font-weight: 600;">Status: Fetching...</p>
                     </div>
                 </div>
 
                 <div class="package-card" style="display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px;">
-                    <p style="color: var(--text-muted); font-size: 0.8rem;">Your VLESS Config</p>
+                    <p style="color: var(--text-muted); font-size: 0.8rem;">VPN Connection</p>
                     <button id="copy-config-btn" onclick="copyVpnConfig()" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--accent-blue); color: white; border: none; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                        <i class="fas fa-copy"></i> Copy Config
+                        <i class="fas fa-copy"></i> Copy VLESS Config
                     </button>
                 </div>
             </div>
@@ -198,7 +198,7 @@
         let cart = [];
         const container = document.getElementById('packageList');
         packageData.forEach((pkg, index) => {
-            container.innerHTML += `<div class=\"package-card\"><div class=\"pkg-header\"><div class=\"pkg-title\">${pkg.name}</div><div class=\"pkg-price\">Rs ${pkg.price}.00</div></div><ul class=\"features\"><li><i class=\"fas fa-check-circle\"></i> ${pkg.data} / 30 Days</li></ul><button class=\"btn-buy\" onclick=\"addToCart(${index})\">Buy Now</button></div>`;
+            container.innerHTML += `<div class="package-card"><div class="pkg-header"><div class="pkg-title">${pkg.name}</div><div class="pkg-price">Rs ${pkg.price}.00</div></div><ul class="features"><li><i class="fas fa-check-circle"></i> ${pkg.data} / 30 Days</li></ul><button class="btn-buy" onclick="addToCart(${index})">Buy Now</button></div>`;
         });
 
         function addToCart(index) { cart.push(packageData[index]); updateCartUI(); }
@@ -211,7 +211,7 @@
                 document.getElementById('empty-cart-state').style.display = 'none';
                 document.getElementById('active-cart-state').style.display = 'block';
                 let list = ''; let total = 0;
-                cart.forEach((item, idx) => { total += item.price; list += `<div class=\"info-row\"><span>${item.name}</span><strong>Rs ${item.price}.00 <i class=\"fas fa-trash btn-remove\" onclick=\"removeFromCart(${idx})\"></i></strong></div>`; });
+                cart.forEach((item, idx) => { total += item.price; list += `<div class="info-row"><span>${item.name}</span><strong>Rs ${item.price}.00 <i class="fas fa-trash btn-remove" onclick="removeFromCart(${idx})"></i></strong></div>`; });
                 document.getElementById('cart-items-list').innerHTML = list;
                 document.getElementById('cart-total-price').innerText = total.toFixed(2);
             } else {
@@ -226,47 +226,56 @@
         function updateUI(user) {
             document.querySelectorAll('.user-display-name').forEach(el => el.innerText = user.displayName);
             document.getElementById('acc-email').innerText = user.email;
-            if(user.photoURL) document.getElementById('acc-avatar').innerHTML = `<img src=\"${user.photoURL}\">`;
+            if(user.photoURL) document.getElementById('acc-avatar').innerHTML = `<img src="${user.photoURL}">`;
 
-            // LIVE USAGE FETCH
+            // LIVE DATA FETCHING
             const workerURL = `https://netrox-api.rasanga.workers.dev/?email=${user.email}`;
-            fetch(workerURL).then(res => res.json()).then(data => {
-                const used = parseFloat(data.usage) || 0;
-                const limit = 100; const per = (used / limit) * 100;
-                document.getElementById("usage-display").innerText = used.toFixed(2) + " GB";
-                document.getElementById("usage-progress").style.width = (per > 100 ? 100 : per) + "%";
-                document.getElementById("usage-percentage").innerText = per.toFixed(1) + "% Used";
-                document.getElementById("expiry-display").innerText = "Valid: " + (data.expiry || "Active");
-            }).catch(e => {
-                console.log("Usage load error");
-                document.getElementById("usage-display").innerText = "Error";
-            });
-            
+            fetch(workerURL)
+                .then(res => res.json())
+                .then(data => {
+                    const used = parseFloat(data.usage) || 0;
+                    const limit = 100; // ඔයාට ඕන ලිමිට් එක මෙතන දාන්න
+                    const percentage = (used / limit) * 100;
+                    
+                    document.getElementById("usage-display").innerText = used.toFixed(2) + " GB";
+                    document.getElementById("usage-progress").style.width = (percentage > 100 ? 100 : percentage) + "%";
+                    document.getElementById("usage-percentage").innerText = percentage.toFixed(1) + "% Used";
+                    document.getElementById("limit-text").innerText = `Monthly Limit: ${limit} GB`;
+                    document.getElementById("expiry-display").innerText = "Status: " + (data.expiry || "Active");
+                })
+                .catch(err => {
+                    console.error("Worker Error:", err);
+                    document.getElementById("usage-display").innerText = "Error";
+                });
+                
             window.currentUserEmail = user.email;
         }
 
         async function copyVpnConfig() {
             const btn = document.getElementById('copy-config-btn');
-            const configWorker = `https://netrox-config-fetcher.rasanga.workers.dev/?email=${window.currentUserEmail}`;
+            const originalText = btn.innerHTML;
+            const configWorker = `https://netrox-config-fetcher.kalpikachampathi.workers.dev/?email=${window.currentUserEmail}`;
+            
             try {
-                btn.innerHTML = '<i class=\"fas fa-spinner fa-spin\"></i> Fetching...';
-                const res = await fetch(configWorker); 
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching...';
+                const res = await fetch(configWorker);
                 const txt = await res.text();
                 await navigator.clipboard.writeText(txt);
-                btn.innerHTML = '<i class=\"fas fa-check\"></i> Copied!';
-                setTimeout(() => { btn.innerHTML = '<i class=\"fas fa-copy\"></i> Copy Config'; }, 2000);
-            } catch (e) { 
-                btn.innerHTML = 'Error!'; 
-                setTimeout(() => { btn.innerHTML = '<i class=\"fas fa-copy\"></i> Copy Config'; }, 2000);
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => { btn.innerHTML = originalText; }, 2000);
+            } catch (e) {
+                btn.innerHTML = '<i class="fas fa-times"></i> Error!';
+                setTimeout(() => { btn.innerHTML = originalText; }, 2000);
             }
         }
 
         auth.onAuthStateChanged(user => { if (user) { updateUI(user); document.getElementById('login-overlay').style.display = 'none'; } });
 
         function sendWhatsApp() {
-            const user = auth.currentUser; let list = ""; let total = 0;
-            cart.forEach((item, i) => { list += `${i+1}. ${item.name}\\n`; total += item.price; });
-            const msg = `*NETROX ORDER*\\nName: ${user.displayName}\\nItems:\\n${list}Total: Rs.${total}`;
+            const user = auth.currentUser;
+            let list = ""; let total = 0;
+            cart.forEach((item, i) => { list += `${i+1}. ${item.name} (Rs.${item.price})\n`; total += item.price; });
+            const msg = `*--- NETROX ORDER ---*\n\nName: ${user.displayName}\nEmail: ${user.email}\n\nPackages:\n${list}\nTotal: Rs.${total}.00`;
             window.open(`https://wa.me/94760216144?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
