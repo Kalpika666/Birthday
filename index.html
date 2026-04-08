@@ -23,17 +23,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background-color: var(--bg-dark); color: var(--text-main); display: flex; min-height: 100vh; overflow-x: hidden; }
 
-        .sidebar {
-            width: 260px;
-            background-color: var(--sidebar-bg);
-            padding: 25px;
-            position: fixed;
-            height: 100vh;
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            z-index: 100;
-        }
+        .sidebar { width: 260px; background-color: var(--sidebar-bg); padding: 25px; position: fixed; height: 100vh; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; z-index: 100; }
 
         @media (max-width: 768px) {
             body { flex-direction: column; }
@@ -60,7 +50,15 @@
 
         .package-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; margin-top: 20px; }
         .package-card { background: var(--card-bg); padding: 25px; border-radius: 20px; border: 1px solid var(--border-color); transition: 0.3s; }
-        .package-card:hover { border-color: var(--accent-blue); transform: translateY(-3px); }
+        
+        .pkg-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .pkg-title { font-weight: 700; color: var(--accent-blue); text-transform: uppercase; font-size: 0.9rem; }
+        .pkg-price { font-weight: 700; color: white; font-size: 1rem; }
+        .features { list-style: none; margin-bottom: 20px; }
+        .features li { font-size: 0.85rem; color: var(--text-muted); background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 10px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+
+        .btn-buy { width: 100%; padding: 10px; border-radius: 10px; border: none; background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .btn-buy:hover { background: var(--accent-blue); color: white; }
 
         .usage-val { font-size: 1.4rem; font-weight: 700; color: white; display: block; margin-bottom: 5px; }
         .usage-label { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
@@ -70,8 +68,8 @@
 
         .config-box { background: #0f172a; border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; font-family: monospace; font-size: 0.8rem; color: var(--accent-blue); word-break: break-all; margin-top: 15px; max-height: 100px; overflow-y: auto; }
         .btn-copy { background: var(--accent-blue); color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; margin-top: 10px; transition: 0.3s; }
-        
-        /* New Username Input Style */
+
+        /* Username Input Styling */
         .user-input-group { display: flex; gap: 10px; margin-bottom: 25px; background: var(--card-bg); padding: 15px; border-radius: 15px; border: 1px solid var(--border-color); }
         .user-input-group input { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border-color); background: #0f172a; color: white; outline: none; }
         .user-input-group button { padding: 0 20px; background: var(--accent-blue); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
@@ -82,6 +80,10 @@
         #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); z-index: 2000; display: flex; align-items: center; justify-content: center; }
         .login-card { background: var(--sidebar-bg); padding: 40px; border-radius: 24px; border: 1px solid var(--border-color); text-align: center; max-width: 400px; width: 90%; }
         .btn-google { width: 100%; padding: 14px; border-radius: 12px; border: none; background: white; color: #0f172a; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; }
+        
+        .btn-checkout { margin-top: 20px; width: 100%; padding: 15px; background: var(--accent-blue); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-remove { color: #ef4444; cursor: pointer; margin-left: 12px; }
+        .info-row { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid var(--border-color); }
     </style>
 </head>
 <body>
@@ -90,7 +92,6 @@
         <div class="login-card">
             <div class="logo"><i class="fas fa-infinity"></i> NETROX</div>
             <h3>Welcome to NetroX</h3>
-            <p style="color: var(--text-muted); margin-top: 10px;">Sign in to check your usage</p>
             <button class="btn-google" onclick="signIn()"><i class="fab fa-google"></i> Login with Google</button>
         </div>
     </div>
@@ -99,6 +100,8 @@
         <div class="logo"><i class="fas fa-infinity"></i> NETROX</div>
         <ul class="nav-links">
             <li><a href="#" class="active" onclick="showPage('dashboard', this)"><i class="fas fa-th-large"></i> Dashboard</a></li>
+            <li><a href="#" onclick="showPage('packages', this)"><i class="fas fa-box"></i> Packages</a></li>
+            <li><a href="#" onclick="showPage('orders', this)"><i class="fas fa-shopping-cart"></i> Orders <span id="cart-count">0</span></a></li>
             <li><a href="#" onclick="showPage('accounts', this)"><i class="fas fa-user"></i> My Account</a></li>
         </ul>
         <button class="logout-btn" onclick="signOut()"><i class="fas fa-sign-out-alt"></i> Logout</button>
@@ -106,46 +109,45 @@
 
     <div class="main-content">
         <div id="dashboard" class="section-content active">
-            <h2>Welcome, <span id="welcome-name" class="user-display-name">Guest</span>!</h2>
-            <p style="color: var(--text-muted); margin-bottom: 25px;">Enter your VPN username to see details</p>
+            <h2>Welcome Back, <span id="welcome-name" class="user-display-name">Guest</span>!</h2>
+            <p style="color: var(--text-muted); margin-bottom: 25px;">Enter VPN username to see details</p>
 
             <div class="user-input-group">
-                <input type="text" id="vpn-user-id" placeholder="Enter VPN Username (Ex: Kalpika)">
-                <button onclick="checkMyUsage()">Check Usage</button>
+                <input type="text" id="vpn-user-input" placeholder="Enter VPN Username (Ex: Kalpika)">
+                <button onclick="manualCheck()">Check Usage</button>
             </div>
             
             <div class="package-grid">
-                <div class="package-card" style="text-align: center;">
-                    <span class="usage-label">Status</span>
-                    <div style="margin-top: 10px;"><span id="usage-status" class="status-badge status-offline">N/A</span></div>
-                </div>
-                <div class="package-card" style="text-align: center;">
-                    <span class="usage-label">Download</span>
-                    <span id="usage-down" class="usage-val">0.00 GB</span>
-                </div>
-                <div class="package-card" style="text-align: center;">
-                    <span class="usage-label">Upload</span>
-                    <span id="usage-up" class="usage-val">0.00 GB</span>
-                </div>
-                <div class="package-card" style="text-align: center;">
-                    <span class="usage-label">Expire Date</span>
-                    <span id="usage-expire" class="usage-val">-- / --</span>
-                </div>
+                <div class="package-card" style="text-align: center;"><span class="usage-label">Status</span><div style="margin-top: 10px;"><span id="usage-status" class="status-badge status-offline">N/A</span></div></div>
+                <div class="package-card" style="text-align: center;"><span class="usage-label">Download</span><span id="usage-down" class="usage-val">0.00 GB</span></div>
+                <div class="package-card" style="text-align: center;"><span class="usage-label">Upload</span><span id="usage-up" class="usage-val">0.00 GB</span></div>
+                <div class="package-card" style="text-align: center;"><span class="usage-label">Expire Date</span><span id="usage-expire" class="usage-val">-- / --</span></div>
             </div>
 
             <div class="package-card" style="margin-top: 25px;">
                 <h3 style="font-size: 1rem; color: var(--accent-blue);"><i class="fas fa-key"></i> Your VPN Configuration</h3>
-                <div id="config-text" class="config-box">Please log in to see config...</div>
+                <div id="config-text" class="config-box">Loading...</div>
                 <button class="btn-copy" onclick="copyConfig()"><i class="fas fa-copy"></i> Copy Config</button>
+            </div>
+        </div>
+
+        <div id="packages" class="section-content">
+            <h2>Available Packages</h2>
+            <div class="package-grid" id="packageList"></div>
+        </div>
+
+        <div id="orders" class="section-content">
+            <h2>My Orders</h2>
+            <div id="empty-cart-state" style="text-align: center; padding: 40px;"><i class="fas fa-shopping-cart" style="font-size: 3rem; color: #334155;"></i><h3>No Orders</h3></div>
+            <div id="active-cart-state" style="display: none;">
+                <div id="cart-items-list"></div>
+                <div style="margin-top: 20px; text-align: right;"><h3>Total: Rs <span id="cart-total-price">0.00</span></h3><button class="btn-checkout" onclick="sendWhatsApp()"><i class="fab fa-whatsapp"></i> Checkout</button></div>
             </div>
         </div>
 
         <div id="accounts" class="section-content">
             <h2>Account Details</h2>
-            <div class="package-card" style="margin-top: 20px;">
-                <p>Email: <span id="acc-email">...</span></p>
-                <p>Name: <span class="user-display-name">...</span></p>
-            </div>
+            <div class="package-card"><p>Email: <span id="acc-email">...</span></p><p>Name: <span class="user-display-name">...</span></p></div>
         </div>
     </div>
 
@@ -155,46 +157,53 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCvUlVKoDIPG_w23ZzyHLpcyRO1yEfqmmU",
-            authDomain: "netrox-database.firebaseapp.com",
-            projectId: "netrox-database",
-            storageBucket: "netrox-database.firebasestorage.app",
-            messagingSenderId: "847178411597",
-            appId: "1:847178411597:web:827582517f94cec141f604"
-        };
-
+        const firebaseConfig = { apiKey: "AIzaSyCvUlVKoDIPG_w23ZzyHLpcyRO1yEfqmmU", authDomain: "netrox-database.firebaseapp.com", projectId: "netrox-database", storageBucket: "netrox-database.firebasestorage.app", messagingSenderId: "847178411597", appId: "1:847178411597:web:827582517f94cec141f604" };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const provider = new firebase.auth.GoogleAuthProvider();
 
-        function checkMyUsage() {
-            const user = document.getElementById('vpn-user-id').value;
-            if(user) fetchUsage(user);
-            else alert("Please enter a username!");
+        const packageData = [
+            { name: "Dialog Zoom (Router)", price: 450, data: "Unlimited" },
+            { name: "Dialog Zoom (Sim)", price: 200, data: "200 GB" },
+            { name: "Dialog Tiktok", price: 150, data: "100 GB" },
+            { name: "SLT Zoom", price: 450, data: "Unlimited" },
+            { name: "SLT Netflix", price: 450, data: "Unlimited" },
+            { name: "Mobitel Zoom", price: 200, data: "200 GB" },
+            { name: "Hutch Zoom", price: 200, data: "200 GB" },
+            { name: "Hutch Gaming", price: 450, data: "Unlimited" },
+            { name: "Hutch Social", price: 150, data: "100 GB" },
+            { name: "Airtel Zoom", price: 200, data: "200 GB" },
+            { name: "Airtel Tiktok", price: 150, data: "100 GB" },
+            { name: "Airtel 389 / 909", price: 150, data: "100 GB" }
+        ];
+
+        let cart = [];
+        const container = document.getElementById('packageList');
+        packageData.forEach((pkg, index) => {
+            container.innerHTML += `<div class="package-card"><div class="pkg-header"><div class="pkg-title">${pkg.name}</div><div class="pkg-price">Rs ${pkg.price}</div></div><ul class="features"><li><i class="fas fa-check-circle"></i> ${pkg.data}</li></ul><button class="btn-buy" onclick="addToCart(${index})">Buy Now</button></div>`;
+        });
+
+        function manualCheck() {
+            const user = document.getElementById('vpn-user-input').value;
+            if(user) fetchUsage(user); else alert("Please enter username!");
         }
 
         async function fetchUsage(username) {
             const statusEl = document.getElementById('usage-status');
+            statusEl.innerText = "Checking...";
             try {
-                statusEl.innerText = "Checking...";
-                // Your VPS IP
                 const res = await fetch(`http://139.59.255.162:5000/api/usage/${username}`);
                 const data = await res.json();
-                
-                if (data && !data.error) {
+                if(data && !data.error) {
                     document.getElementById('usage-down').innerText = data.down;
                     document.getElementById('usage-up').innerText = data.up;
                     document.getElementById('usage-expire').innerText = "Unlimited";
-                    statusEl.innerText = "Active";
-                    statusEl.className = "status-badge status-online";
+                    statusEl.innerText = "Active"; statusEl.className = "status-badge status-online";
                 } else {
-                    statusEl.innerText = "Not Found";
-                    statusEl.className = "status-badge status-offline";
+                    statusEl.innerText = "Not Found"; statusEl.className = "status-badge status-offline";
                 }
-            } catch (err) {
-                statusEl.innerText = "Error";
-                statusEl.className = "status-badge status-offline";
+            } catch {
+                statusEl.innerText = "Error"; statusEl.className = "status-badge status-offline";
             }
         }
 
@@ -203,18 +212,33 @@
                 const res = await fetch(`https://api.netrox.online/get-config?email=${email}`);
                 const data = await res.json();
                 document.getElementById('config-text').innerText = data.config || "No config found.";
-            } catch {
-                document.getElementById('config-text').innerText = "Error loading config.";
+            } catch { document.getElementById('config-text').innerText = "Error loading config."; }
+        }
+
+        function addToCart(index) { cart.push(packageData[index]); updateCartUI(); }
+        function removeFromCart(index) { cart.splice(index, 1); updateCartUI(); }
+
+        function updateCartUI() {
+            document.getElementById('cart-count').innerText = cart.length;
+            document.getElementById('cart-count').style.display = cart.length > 0 ? 'block' : 'none';
+            const listEl = document.getElementById('cart-items-list');
+            const totalEl = document.getElementById('cart-total-price');
+            if (cart.length > 0) {
+                document.getElementById('empty-cart-state').style.display = 'none';
+                document.getElementById('active-cart-state').style.display = 'block';
+                listEl.innerHTML = ''; let total = 0;
+                cart.forEach((item, index) => {
+                    total += item.price;
+                    listEl.innerHTML += `<div class="info-row"><span>${item.name} <i class="fas fa-trash-alt btn-remove" onclick="removeFromCart(${index})"></i></span><strong>Rs ${item.price}</strong></div>`;
+                });
+                totalEl.innerText = total.toFixed(2);
+            } else {
+                document.getElementById('empty-cart-state').style.display = 'block';
+                document.getElementById('active-cart-state').style.display = 'none';
             }
         }
 
-        function signIn() {
-            auth.signInWithPopup(provider).then(res => {
-                updateUI(res.user);
-                document.getElementById('login-overlay').style.display = 'none';
-            });
-        }
-
+        function signIn() { auth.signInWithPopup(provider).then(res => { updateUI(res.user); document.getElementById('login-overlay').style.display = 'none'; }); }
         function signOut() { auth.signOut().then(() => { location.reload(); }); }
 
         function updateUI(user) {
@@ -223,24 +247,23 @@
             fetchConfig(user.email);
         }
 
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                updateUI(user);
-                document.getElementById('login-overlay').style.display = 'none';
-            }
-        });
+        auth.onAuthStateChanged(user => { if (user) { updateUI(user); document.getElementById('login-overlay').style.display = 'none'; } });
 
-        function copyConfig() {
-            const text = document.getElementById('config-text').innerText;
-            navigator.clipboard.writeText(text).then(() => alert("Copied!"));
+        function sendWhatsApp() {
+            const user = auth.currentUser;
+            let list = ""; let total = 0;
+            cart.forEach((item, i) => { list += `${i+1}. ${item.name} (Rs.${item.price})\n`; total += item.price; });
+            const msg = `*--- NETROX ORDER ---*\n\n*Name:* ${user.displayName}\n*Packages:*\n${list}\n*Total:* Rs.${total}`;
+            window.open(`https://wa.me/94760216144?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        function showPage(pageId, elm) {
+        function showPage(id, elm) {
             document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            elm.classList.add('active');
+            document.getElementById(id).classList.add('active'); elm.classList.add('active');
         }
+
+        function copyConfig() { navigator.clipboard.writeText(document.getElementById('config-text').innerText).then(() => alert("Copied!")); }
     </script>
 </body>
 </html>
