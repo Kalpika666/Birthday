@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Pinidi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --dark: #0a0a0a;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--dark);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* 1. Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('image.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .hero h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 5rem;
+            color: var(--gold);
+            margin: 0;
+            text-shadow: 0 5px 20px rgba(0,0,0,0.8);
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            animation: bounce 2s infinite;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            color: var(--gold);
+        }
+
+        /* 2. Message Section */
+        .content-section {
+            padding: 80px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            padding: 40px;
+            border-radius: 30px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        /* 3. Image Gallery (Size අඩු කර ලස්සනට සකස් කළා) */
+        .gallery {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .gallery-item {
+            width: 280px; /* පින්තූරයේ පළල අඩු කළා */
+            height: 350px; /* උස මඳක් අඩු කළා */
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-10px);
+            border-color: var(--gold);
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4);
+        }
+
+        /* 4. Footer Section */
+        footer {
+            height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(transparent, var(--gold));
+            color: black;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .btn-music {
+            background: black;
+            color: var(--gold);
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-10px);}
+            60% {transform: translateY(-5px);}
+        }
+
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 3.5rem; }
+            .gallery-item { width: 100%; max-width: 280px; }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bdaySong" src="song.mp3" loop></audio>
+
+    <section class="hero">
+        <p style="letter-spacing: 5px; text-transform: uppercase;">Happy Birthday</p>
+        <h1>Pinidi</h1>
+        <div class="scroll-indicator">SCROLL DOWN ↓</div>
+    </section>
+
+    <section class="content-section">
+        <div class="glass-card">
+            <h2 style="font-family: 'Dancing Script'; font-size: 2.5rem; color: var(--gold);">To Someone Special</h2>
+            <p style="line-height: 1.8; color: #ddd;">
+                "පෑයූ සදක් වගේ ඔබේ ජීවිතය හැමදාමත් ලස්සන වෙන්න කියලා ප්‍රාර්ථනා කරනවා. 
+                ඔබේ හීන සියල්ලම සැබෑ වන, සතුට පිරුණු අලුත් අවුරුද්දක් වේවා!"
+            </p>
+        </div>
+    </section>
+
+    <h2 style="text-align: center; font-family: 'Dancing Script'; font-size: 2.5rem; color: var(--gold); margin-bottom: 30px;">Captured Moments</h2>
+    <section class="gallery">
+        <div class="gallery-item"><img src="image.jpeg"></div>
+        <div class="gallery-item"><img src="image2.jpeg"></div>
+        <div class="gallery-item"><img src="image3.jpeg"></div> 
+    </section>
+
+    <footer>
+        <h2 style="font-family: 'Dancing Script'; font-size: 3.5rem;">Have a Blast!</h2>
+        <p>Click below to start the magic music</p>
+        <button class="btn-music" onclick="startMagic()">PLAY MUSIC 🎵</button>
+        <p style="margin-top: 50px; font-size: 0.8rem;">Designed for Kalpika 🌝</p>
+    </footer>
+
+    <script>
+        function startMagic() {
+            const music = document.getElementById('bdaySong');
+            music.play();
+            
+            var end = Date.now() + (15 * 1000);
+            var colors = ['#D4AF37', '#ffffff'];
+
+            (function frame() {
+              confetti({
+                particleCount: 2,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 },
+                colors: colors
+              });
+              confetti({
+                particleCount: 2,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 },
+                colors: colors
+              });
+
+              if (Date.now() < end) {
+                requestAnimationFrame(frame);
+              }
+            }());
+        }
+    </script>
+</body>
+</html>
